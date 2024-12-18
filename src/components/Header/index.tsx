@@ -2,14 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ModalForm from '../ModalCreateProduct';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
+import { ProductCardProps } from '@/types/productType';
 
 type HeaderProps = {
   onSearch: (query: string) => void;
   onSort: (type: 'title' | 'brand', order: 'asc' | 'desc') => void;
   onLogout: () => void;
+  setProductsState: React.Dispatch<React.SetStateAction<ProductCardProps[]>>
 };
 
-export const Header = ({ onSearch, onSort, onLogout }: HeaderProps) => {
+export const Header = ({ onSearch, onSort, onLogout, setProductsState }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSort, setSelectedSort] = useState('Ordenar por');
@@ -75,7 +77,7 @@ export const Header = ({ onSearch, onSort, onLogout }: HeaderProps) => {
         </button>
       </nav>
 
-      <ModalForm open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ModalForm open={isModalOpen} onClose={() => setIsModalOpen(false)} setProductsState={setProductsState} />
     </header>
   );
 };

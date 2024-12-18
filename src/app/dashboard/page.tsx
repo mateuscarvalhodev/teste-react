@@ -125,7 +125,7 @@ export const Dashboard = () => {
 
   return (
     <div className='flex flex-col min-h-screen'>
-      <Header onSearch={searchProduct} onSort={sortProducts} onLogout={handleLogout} />
+      <Header onSearch={searchProduct} onSort={sortProducts} onLogout={handleLogout} setProductsState={setProducts} />
 
       <div className='flex-grow container mx-auto px-4'>
         {loading ? (

@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 type ModalFormProps = {
   open: boolean;
   onClose: () => void;
+  setProductsState: React.Dispatch<React.SetStateAction<ProductCardProps[]>>
 };
 
 const CurrencyInput = ({ id, placeholder, value, onChange, errorMessage }: CurrencyInputTypes) => (
@@ -36,7 +37,7 @@ const CurrencyInput = ({ id, placeholder, value, onChange, errorMessage }: Curre
   </div>
 );
 
-function ModalForm({ open, onClose }: ModalFormProps) {
+function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ProductCardProps>();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
@@ -65,14 +66,29 @@ function ModalForm({ open, onClose }: ModalFormProps) {
       const formattedPrice = Number(priceValue.replace(/[^\d]/g, '')) / 100;
 
       const payload = { ...data, price: formattedPrice };
-      const response = await api.post('/products/add', payload);
+      const { data: product } = await api.post<ProductCardProps>('/products/add',
+        {
+          ...payload,
+          // thumbnail: `${FALLBACK_IMAGE}-${Date.now()}`,
+          // images: [`${FALLBACK_IMAGE}-${Date.now()}`],
+          stock: 100,
+          discountPercentage: 0,
+          rating: 5
+        }
+      );
+
+      setProductsState((prev) => {
+        if (product) {
+          return [...prev, product];
+        }
+        return prev;
+      });
 
       toast({
         title: 'Sucesso',
         description: 'Produto adicionado com sucesso!',
       });
 
-      console.log('Produto adicionado com sucesso:', response.data);
       reset();
       onClose();
     } catch (error) {
@@ -101,6 +117,16 @@ function ModalForm({ open, onClose }: ModalFormProps) {
               className='border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
               placeholder='Digite o título'
               {...register('title', { required: true })}
+            />
+            {errors.title && <p className='text-red-500 text-sm'>Título é obrigatório.</p>}
+          </div>
+          <div>
+            <Label htmlFor='brand'>Brand</Label>
+            <Input
+              id='brand'
+              className='border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
+              placeholder='Digite o título'
+              {...register('brand', { required: true })}
             />
             {errors.title && <p className='text-red-500 text-sm'>Título é obrigatório.</p>}
           </div>
