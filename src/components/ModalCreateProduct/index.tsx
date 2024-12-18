@@ -1,13 +1,21 @@
-// ModalForm.tsx
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import api from '@/services/axiosinstance';
 import { Input } from '../ui/input';
-import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '../ui/alert-dialog';
 import { ProductCardProps } from '@/types/productType';
+import { useCurrencyFormat } from '@/hooks/useCurrency';
+import { CurrencyInputTypes } from '@/types/currencyInputTypes';
+import { useToast } from '@/hooks/use-toast';
 
 
 type ModalFormProps = {
@@ -15,10 +23,26 @@ type ModalFormProps = {
   onClose: () => void;
 };
 
-const ModalForm: React.FC<ModalFormProps> = ({ open, onClose }) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductCardProps>();
+const CurrencyInput = ({ id, placeholder, value, onChange, errorMessage }: CurrencyInputTypes) => (
+  <div>
+    <Input
+      id={id}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className='border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
+    />
+    {errorMessage && <p className='text-red-500 text-sm'>{errorMessage}</p>}
+  </div>
+);
+
+function ModalForm({ open, onClose }: ModalFormProps) {
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ProductCardProps>();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
+  const { value: priceValue, handleChange: handlePriceChange } = useCurrencyFormat('R$ 0,00');
+
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -26,22 +50,37 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, onClose }) => {
         const response = await api.get('/products/category-list');
         setCategories(response.data);
       } catch (error) {
-        console.error('Erro ao buscar categorias:', error);
+        toast({ title: 'Erro', description: 'Erro ao buscar categorias.', variant: 'destructive' });
       }
     };
 
     if (open) {
       fetchCategories();
     }
-  }, [open]);
+  }, [open, toast]);
+
   const onSubmit = async (data: ProductCardProps) => {
     try {
       setLoading(true);
-      const response = await api.post('/products/add', data);
+      const formattedPrice = Number(priceValue.replace(/[^\d]/g, '')) / 100;
+
+      const payload = { ...data, price: formattedPrice };
+      const response = await api.post('/products/add', payload);
+
+      toast({
+        title: 'Sucesso',
+        description: 'Produto adicionado com sucesso!',
+      });
+
       console.log('Produto adicionado com sucesso:', response.data);
       reset();
       onClose();
     } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Erro ao adicionar produto. Tente novamente.',
+        variant: 'destructive',
+      });
       console.error('Erro ao adicionar produto:', error);
     } finally {
       setLoading(false);
@@ -68,14 +107,17 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, onClose }) => {
 
           <div>
             <Label htmlFor='price'>Preço</Label>
-            <Input
+            <CurrencyInput
               id='price'
-              type='number'
-              className='border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
               placeholder='Digite o preço'
-              {...register('price', { required: true, valueAsNumber: true })}
+              value={priceValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                handlePriceChange(e);
+                const numericValue = Number(e.target.value.replace(/[^\d]/g, '')) / 100;
+                setValue('price', numericValue);
+              }}
+              errorMessage={errors.price?.message}
             />
-            {errors.price && <p className='text-red-500 text-sm'>Preço é obrigatório.</p>}
           </div>
 
           <div>
@@ -117,6 +159,6 @@ const ModalForm: React.FC<ModalFormProps> = ({ open, onClose }) => {
       </AlertDialogContent>
     </AlertDialog>
   );
-};
+}
 
 export default ModalForm;

@@ -8,14 +8,14 @@ async function handleRedirect(returnUrl: string, redirectTo: string, redirectPat
 }
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  const cookieStore = cookies()
-  const token = (await cookieStore).get('token')
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get('accessToken')
 
-  if (token && request.nextUrl.pathname === '/') {
+  if (accessToken && request.nextUrl.pathname === '/') {
     return NextResponse.redirect(`${request.nextUrl.origin}/dashboard`)
   }
 
-  if (!token && request.nextUrl.pathname !== '/') {
+  if (!accessToken && request.nextUrl.pathname !== '/') {
     return handleRedirect(request.url, request.nextUrl.origin, '/')
   }
 
@@ -28,5 +28,6 @@ export const config = {
     '/dashboard/:path*', 
     '/profile/:path*',   
     '/admin/:path*',     
+    
   ],
 }

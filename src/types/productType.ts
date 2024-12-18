@@ -1,8 +1,8 @@
 export type ProductCardProps = {
   id?: number;
-  category?: string;
+  category?: string[];
   title: string;
-  image: string;
+  thumbnail: string;
   description?: string;
   price: number;
   discountPercentage?: number;
@@ -10,4 +10,5 @@ export type ProductCardProps = {
   stock?: number;
   images?: string[];
   rating?: number;
+  brand: string;
 };

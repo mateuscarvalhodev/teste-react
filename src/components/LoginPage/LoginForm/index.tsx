@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import FloatingInput from '@/components/FloatInput';
 import axios, { AxiosError } from 'axios';
+import { LoginPayloadType } from '@/types/auth/authPayloadTypes'
+import { LoginResponseType } from '@/types/auth/authResponseTypes'
 
 export const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -22,34 +24,36 @@ export const LoginForm = () => {
     setPasswordError(false);
 
     if (!username.trim() || !password.trim()) {
-      if (!username.trim()) {
-        setUsernameError(true);
-      }
-      if (!password.trim()) {
-        setPasswordError(true);
-      }
+      setUsernameError(!username.trim());
+      setPasswordError(!password.trim());
       setFormError('Login e senha são obrigatórios.');
       setIsLoading(false);
       return;
     }
-    try {
-      const res = await axios.post('/api/auth/login', {
-        username,
-        password
-      })
-      router.push(res.data.redirectTo)
-      console.log(res)
-    } catch (error: unknown) {
-      if (error instanceof AxiosError && error.response) {
-        setFormError(error.response.data)
 
-      } else {
-        setFormError('Ocorreu um erro inesperado')
-      }
-
+    const payload: LoginPayloadType = {
+      username,
+      password
     }
+    try {
+      const res = await axios.post<LoginResponseType>('/api/auth/login', payload);
 
-    setIsLoading(false);
+      if (res.status === 200 && res.data.redirectTo) {
+        router.push(res.data.redirectTo);
+      } else {
+        setFormError('Erro inesperado. Tente novamente.');
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof AxiosError) {
+        const errorMessage = error.response?.data?.message || 'Erro ao realizar login.';
+        setFormError(errorMessage);
+      } else {
+        setFormError('Erro desconhecido. Tente novamente.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
