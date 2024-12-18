@@ -1,15 +1,6 @@
 import { FloatingInputProps } from '@/types/floatingInputTypes';
 import React from 'react';
 
-// interface FloatingInputProps {
-//   id: string;
-//   label: string;
-//   type?: string;
-//   value: string;
-//   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-//   error?: boolean;
-// }
-
 const FloatingInput = ({
   id,
   label,

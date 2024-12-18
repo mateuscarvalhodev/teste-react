@@ -30,7 +30,7 @@ export const LoginForm = () => {
       setIsLoading(false);
       return;
     }
-
+    console.log('Username:', username, 'Password:', password);
     const payload: LoginPayloadType = {
       username,
       password

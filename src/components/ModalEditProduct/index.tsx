@@ -16,13 +16,23 @@ import { ProductCardProps } from '@/types/productType';
 import { useCurrencyFormat } from '@/hooks/useCurrency';
 import { CurrencyInputTypes } from '@/types/currencyInputTypes';
 import { useToast } from '@/hooks/use-toast';
-import { MultiSelectDropdown } from '../ui/multi-select';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { MultiSelectDropdown } from "@/components/ui/multi-select"
 
-
-type ModalFormProps = {
+type ModalEditProps = {
   open: boolean;
   onClose: () => void;
-  setProductsState: React.Dispatch<React.SetStateAction<ProductCardProps[]>>
+  product: ProductCardProps | null;
+  onSave: (id: number) => void;
+  setProductState: React.Dispatch<React.SetStateAction<ProductCardProps[]>>
 };
 
 const CurrencyInput = ({ id, placeholder, value, onChange, errorMessage }: CurrencyInputTypes) => (
@@ -38,12 +48,12 @@ const CurrencyInput = ({ id, placeholder, value, onChange, errorMessage }: Curre
   </div>
 );
 
-function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
+function ModalEdit({ open, onClose, product, onSave, setProductState }: ModalEditProps) {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ProductCardProps>();
   const [loading, setLoading] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [categories, setCategories] = useState<string[]>([]);
-  const { value: priceValue, handleChange: handlePriceChange } = useCurrencyFormat('R$ 0,00');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const { value: priceValue, handleChange: handlePriceChange, setValue: setPriceValue } = useCurrencyFormat('R$ 0,00');
 
   const { toast } = useToast();
 
@@ -56,50 +66,49 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
         toast({ title: 'Erro', description: 'Erro ao buscar categorias.', variant: 'destructive' });
       }
     };
+    setSelectedCategories([])
 
     if (open) {
       fetchCategories();
     }
+
   }, [open, toast]);
+
+  useEffect(() => {
+    if (product) {
+      reset(product);
+      setPriceValue(`R$ ${product.price?.toFixed(2) ?? '0,00'}`);
+    }
+  }, [product, reset, setPriceValue]);
 
   const onSubmit = async (data: ProductCardProps) => {
     try {
       setLoading(true);
       const formattedPrice = Number(priceValue.replace(/[^\d]/g, '')) / 100;
 
-      const payload = { ...data, price: formattedPrice };
-      const { data: product } = await api.post<ProductCardProps>('/products/add',
-        {
-          ...payload,
-          // thumbnail: `${FALLBACK_IMAGE}-${Date.now()}`,
-          // images: [`${FALLBACK_IMAGE}-${Date.now()}`],
-          stock: 100,
-          discountPercentage: 0,
-          rating: 5
-        }
-      );
-
-      setProductsState((prev) => {
-        if (product) {
-          return [...prev, product];
-        }
-        return prev;
-      });
+      const payload: Partial<ProductCardProps> = { ...data, price: formattedPrice, category: selectedCategories };
+      delete payload.id
+      // onSave(product?.id, payload);
+      const { data: product } = await api.put<ProductCardProps>(`/products/${data.id}`, payload)
+      console.log({ product })
+      setProductState((prev) => {
+        const filteredPrevProducts = prev.filter((prevProduct) => prevProduct.id !== product.id)
+        return [...filteredPrevProducts, product]
+      })
 
       toast({
         title: 'Sucesso',
-        description: 'Produto adicionado com sucesso!',
+        description: 'Produto atualizado com sucesso!',
       });
 
-      reset();
       onClose();
     } catch (error) {
       toast({
         title: 'Erro',
-        description: 'Erro ao adicionar produto. Tente novamente.',
+        description: 'Erro ao atualizar produto. Tente novamente.',
         variant: 'destructive',
       });
-      console.error('Erro ao adicionar produto:', error);
+      console.error('Erro ao atualizar produto:', error);
     } finally {
       setLoading(false);
     }
@@ -109,7 +118,7 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
     <AlertDialog open={open} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Adicionar Novo Produto</AlertDialogTitle>
+          <AlertDialogTitle>Editar Produto</AlertDialogTitle>
         </AlertDialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <div>
@@ -127,12 +136,11 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
             <Input
               id='brand'
               className='border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
-              placeholder='Digite o título'
+              placeholder='Digite o brand'
               {...register('brand', { required: true })}
             />
-            {errors.title && <p className='text-red-500 text-sm'>Título é obrigatório.</p>}
+            {errors.brand && <p className='text-red-500 text-sm'>Brand é obrigatório.</p>}
           </div>
-
           <div>
             <Label htmlFor='price'>Preço</Label>
             <CurrencyInput
@@ -147,7 +155,6 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
               errorMessage={errors.price?.message}
             />
           </div>
-
           <div>
             <Label htmlFor='description'>Descrição</Label>
             <Input
@@ -157,25 +164,10 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
               {...register('description')}
             />
           </div>
-
           <div>
             <MultiSelectDropdown categories={categories} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} />
-            {/* <Label htmlFor='category'>Categoria</Label>
-            <select
-              id='category'
-              className='w-full border border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
-              {...register('category', { required: true })}
-            >
-              <option value=''>Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select> */}
             {errors.category && <p className='text-red-500 text-sm'>Categoria é obrigatória.</p>}
           </div>
-
           <AlertDialogFooter>
             <Button type='button' variant='ghost' onClick={onClose}>
               Cancelar
@@ -190,4 +182,4 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
   );
 }
 
-export default ModalForm;
+export default ModalEdit;

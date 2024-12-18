@@ -4,6 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '../ui/button';
 import { ProductCardProps } from '@/types/productType';
 
+
 type HeaderProps = {
   onSearch: (query: string) => void;
   onSort: (type: 'title' | 'brand', order: 'asc' | 'desc') => void;

@@ -8,7 +8,7 @@ import { MoreHorizontal } from 'lucide-react';
 
 interface ProductCardPropsWithActions extends ProductCardProps {
   onDelete: () => void;
-  onEdit: (updatedData: Partial<ProductCardProps>) => void;
+  onEdit: (id: number) => void;
 }
 
 const ProductCard = ({
@@ -23,6 +23,7 @@ const ProductCard = ({
   rating = 0,
   onDelete,
   onEdit,
+  id
 }: ProductCardPropsWithActions) => {
   const hasDiscount = discountPercentage > 0;
   const discountedPrice = hasDiscount
@@ -40,11 +41,8 @@ const ProductCard = ({
     }
   });
 
-  const handleEditClick = () => {
-    const newTitle = prompt('Digite o novo título:', title);
-    if (newTitle) {
-      onEdit({ title: newTitle });
-    }
+  const handleEditClick = (id: number) => {
+    onEdit(id);
   };
   return (
     <Card className='min-w-full max-w-full min-h-full max-h-full rounded-lg shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow'>
@@ -67,7 +65,7 @@ const ProductCard = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className='w-32'>
-              <DropdownMenuItem onClick={handleEditClick}>Editar</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditClick(id)}>Editar</DropdownMenuItem>
               <DropdownMenuItem onClick={onDelete} className='text-red-500'>
                 Excluir
               </DropdownMenuItem>

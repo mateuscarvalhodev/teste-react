@@ -1,5 +1,5 @@
 export type ProductCardProps = {
-  id?: number;
+  id: number;
   category?: string[];
   title: string;
   thumbnail: string;
