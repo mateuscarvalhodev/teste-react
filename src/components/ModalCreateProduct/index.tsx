@@ -10,14 +10,14 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
+  AlertDialogDescription
 } from '../ui/alert-dialog';
 import { ProductCardProps } from '@/types/productType';
 import { useCurrencyFormat } from '@/hooks/useCurrency';
 import { CurrencyInputTypes } from '@/types/currencyInputTypes';
 import { useToast } from '@/hooks/use-toast';
 import { MultiSelectDropdown } from '../ui/multi-select';
-
 
 type ModalFormProps = {
   open: boolean;
@@ -41,7 +41,7 @@ const CurrencyInput = ({ id, placeholder, value, onChange, errorMessage }: Curre
 function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ProductCardProps>();
   const [loading, setLoading] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const { value: priceValue, handleChange: handlePriceChange } = useCurrencyFormat('R$ 0,00');
 
@@ -67,24 +67,20 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
       setLoading(true);
       const formattedPrice = Number(priceValue.replace(/[^\d]/g, '')) / 100;
 
-      const payload = { ...data, price: formattedPrice };
-      const { data: product } = await api.post<ProductCardProps>('/products/add',
-        {
-          ...payload,
-          // thumbnail: `${FALLBACK_IMAGE}-${Date.now()}`,
-          // images: [`${FALLBACK_IMAGE}-${Date.now()}`],
-          stock: 100,
-          discountPercentage: 0,
-          rating: 5
-        }
-      );
+      const payload = {
+        ...data,
+        price: formattedPrice,
+        category: selectedCategories
+      };
 
-      setProductsState((prev) => {
-        if (product) {
-          return [...prev, product];
-        }
-        return prev;
+      const { data: product } = await api.post<ProductCardProps>('/products/add', {
+        ...payload,
+        stock: 100,
+        discountPercentage: 0,
+        rating: 5
       });
+
+      setProductsState((prev) => (product ? [...prev, product] : prev));
 
       toast({
         title: 'Sucesso',
@@ -110,6 +106,7 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Adicionar Novo Produto</AlertDialogTitle>
+          <AlertDialogDescription>Preencha as informações do produto.</AlertDialogDescription>
         </AlertDialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <div>
@@ -127,10 +124,10 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
             <Input
               id='brand'
               className='border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
-              placeholder='Digite o título'
+              placeholder='Digite a brand'
               {...register('brand', { required: true })}
             />
-            {errors.title && <p className='text-red-500 text-sm'>Título é obrigatório.</p>}
+            {errors.brand && <p className='text-red-500 text-sm'>Brand é obrigatória.</p>}
           </div>
 
           <div>
@@ -159,20 +156,11 @@ function ModalForm({ open, onClose, setProductsState }: ModalFormProps) {
           </div>
 
           <div>
-            <MultiSelectDropdown categories={categories} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} />
-            {/* <Label htmlFor='category'>Categoria</Label>
-            <select
-              id='category'
-              className='w-full border border-gray-300 focus:ring-purple-400 focus:border-purple-500 rounded-md px-3 py-2 text-sm'
-              {...register('category', { required: true })}
-            >
-              <option value=''>Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select> */}
+            <MultiSelectDropdown
+              categories={categories}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+            />
             {errors.category && <p className='text-red-500 text-sm'>Categoria é obrigatória.</p>}
           </div>
 
