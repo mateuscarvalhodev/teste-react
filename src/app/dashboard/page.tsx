@@ -9,7 +9,7 @@ import { ProductCardProps } from '@/types/productType';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
-export const Dashboard = () => {
+export default function Dashboard() {
   const [products, setProducts] = useState<ProductCardProps[]>([]);
   const [productsFiltered, setProductsFiltered] = useState<ProductCardProps[]>([]);
   const [loading, setLoading] = useState(false);
@@ -97,25 +97,6 @@ export const Dashboard = () => {
     setIsEditModalOpen(true);
   };
 
-  // const handleSaveProduct = async (updatedData: Partial<ProductCardProps>) => {
-  //   setLoading(true);
-  //   try {
-  //     if (selectedProduct?.id) {
-  //       await api.put(`/products/${selectedProduct.id}`, updatedData);
-  //       setProducts((prev) =>
-  //         prev.map((product) => (product.id === selectedProduct.id ? { ...product, ...updatedData } : product))
-  //       );
-  //     } else {
-  //       const response = await api.post('/products/add', updatedData);
-  //       setProducts((prev) => [response.data, ...prev]);
-  //     }
-  //     setIsEditModalOpen(false);
-  //     setSelectedProduct(null);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleLogout = async () => {
     const res = await api.delete('/api/auth/logout');
     router.push(res.data.redirectTo);
@@ -195,4 +176,3 @@ export const Dashboard = () => {
   );
 };
 
-export default Dashboard;
