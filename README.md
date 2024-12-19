@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Aplicação C.R.U.D de Produtos
 
-## Getting Started
+Descrição
 
-First, run the development server:
+Este projeto é uma aplicação web desenvolvida para gerenciar produtos de um curso online. Ele permite realizar operações de C.R.U.D (Criação, Leitura, Atualização e Deleção) e buscar produtos, com funcionalidades adicionais como paginação e ordenação. A aplicação utiliza uma API pública como fonte de dados.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Funcionalidades
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Listagem de Produtos com paginação.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Busca de Produtos por Title ou Brand.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Ordenação de Produtos por Title ou Brand.
 
-## Learn More
+Criação, Edição e Deleção de Produtos.
 
-To learn more about Next.js, take a look at the following resources:
+Vinculação de Categorias: Adicione uma ou mais categorias aos produtos.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tecnologias Utilizadas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Next.js
 
-## Deploy on Vercel
+Node.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Yarn
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Typescript 
+
+Como Executar o Projeto
+
+1. Clonar o Repositório
+
+# Clone o repositório para sua máquina local
+$ git clone git@github.com:mateuscarvalhodev/teste-react.git
+
+2. Instalar Dependências (certifique-se de estar rodando node 18+)
+
+Navegue até a pasta do projeto e execute o comando abaixo:
+
+$ yarn
+
+3. Rodar a Aplicação
+
+Inicie o servidor de desenvolvimento com o comando:
+
+$ yarn dev
+
+Acesse a aplicação no navegador em http://localhost:3000.
+
+4. Login
+
+Use as credenciais abaixo para fazer login:
+
+Usuário: emilys
+
+Senha: emilyspass
+
+API de Referência
+
+A aplicação consome dados da seguinte API pública:
+
+DummyJSON - Products (https://dummyjson.com/docs/products)
+
