@@ -8,6 +8,7 @@ import api from '@/services/axiosinstance';
 import { ProductCardProps } from '@/types/productType';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 export default function Dashboard() {
   const [products, setProducts] = useState<ProductCardProps[]>([]);
@@ -98,7 +99,7 @@ export default function Dashboard() {
   };
 
   const handleLogout = async () => {
-    const res = await api.delete('/api/auth/logout');
+    const res = await axios.delete('/api/auth/logout');
     router.push(res.data.redirectTo);
   };
   console.log({ products })
