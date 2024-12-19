@@ -5,9 +5,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
-} from "./dropdown-menu"
-import { Button } from "./button";
-import { ScrollArea } from "./scroll-area";
+} from './dropdown-menu'
+import { Button } from './button';
+import { ScrollArea } from './scroll-area';
 
 type MultiSelectDropdownProps = {
   categories: string[];
@@ -27,13 +27,13 @@ export const MultiSelectDropdown = ({ categories, selectedCategories, setSelecte
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button variant='outline'>
           Categorias ({selectedCategories.length})
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-full">
+      <DropdownMenuContent className='w-full'>
         <DropdownMenuLabel>Categorias</DropdownMenuLabel>
-        <ScrollArea className="h-72 w-48 rounded-md border">
+        <ScrollArea className='h-72 w-48 rounded-md border'>
           <DropdownMenuSeparator />
           {categories.map((category) => (
             <DropdownMenuCheckboxItem
@@ -42,7 +42,7 @@ export const MultiSelectDropdown = ({ categories, selectedCategories, setSelecte
               onCheckedChange={(isChecked) =>
                 handleSelectCategories(category, isChecked)
               }
-              className="cursor-pointer"
+              className='cursor-pointer'
             >
               {category}
             </DropdownMenuCheckboxItem>

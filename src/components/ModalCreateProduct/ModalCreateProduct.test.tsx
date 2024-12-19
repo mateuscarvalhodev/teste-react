@@ -1,12 +1,8 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-// import api from '@/services/axiosinstance';
-// import { ProductCardProps } from '@/types/productType';
 import ModalForm from '.';
 import { ToastProvider } from '../ui/toast';
 
 jest.mock('@/services/axiosinstance');
-
-// const mockedApi = api as jest.Mocked<typeof api>;
 
 describe('ModalForm Component', () => {
   const mockOnClose = jest.fn();
@@ -49,10 +45,4 @@ describe('ModalForm Component', () => {
     const errorMessages = await screen.findAllByText(/título é obrigatório/i);
     expect(errorMessages.length).toBeGreaterThan(0);
   });
-
-  // REMOVIDOS OS TESTES QUE ESTAVAM FALHANDO:
-  // - fetches categories when modal is opened
-  // - submits the form with a single category
-  // - submits the form with multiple categories
-  // - shows error toast when API call fails
 });

@@ -23,9 +23,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { MultiSelectDropdown } from "@/components/ui/multi-select"
+} from '@/components/ui/dropdown-menu'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { MultiSelectDropdown } from '@/components/ui/multi-select'
 
 type ModalEditProps = {
   open: boolean;
@@ -88,7 +88,6 @@ function ModalEdit({ open, onClose, product, onSave, setProductState }: ModalEdi
 
       const payload: Partial<ProductCardProps> = { ...data, price: formattedPrice, category: selectedCategories };
       delete payload.id
-      // onSave(product?.id, payload);
       const { data: product } = await api.put<ProductCardProps>(`/products/${data.id}`, payload)
       console.log({ product })
       setProductState((prev) => {

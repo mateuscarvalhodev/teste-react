@@ -61,7 +61,7 @@ describe('LoginForm Component', () => {
     render(<LoginForm />);
     const usernameInput = screen.getByLabelText(/login/i);
     const passwordInput = screen.getByLabelText(/senha/i);
-    await userEvent.type(usernameInput, "emilys");
+    await userEvent.type(usernameInput, 'emilys');
     await userEvent.type(passwordInput, 'emilyspass');
     expect(usernameInput).toHaveValue('emilys');
     expect(passwordInput).toHaveValue('emilyspass');
